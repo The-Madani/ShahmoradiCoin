@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاهمرادی کلیکر - Shahmoradi Clicker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            color: #FFD700;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            animation: slideInDown 1s ease-out;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        .score-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #FFD700;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 215, 0, 0.2);
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+        
+        .score-label {
+            font-size: 1.2rem;
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+        
+        .coin-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 40px;
+            animation: slideInUp 1s ease-out 0.6s both;
+        }
+        
+        .coin {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            position: relative;
+            box-shadow: 
+                0 15px 35px rgba(255, 215, 0, 0.3),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.2),
+                inset 0 5px 15px rgba(255, 255, 255, 0.3);
+            border: 3px solid #FFD700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            overflow: hidden;
+        }
+        
+        .coin img {
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .coin::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+            border-radius: 50%;
+            transform: rotate(-45deg);
+        }
+        
+        .coin:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(255, 215, 0, 0.4),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.2),
+                inset 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .coin:active {
+            transform: scale(0.95);
+            transition: all 0.05s ease;
+        }
+        
+        .coin.clicked {
+            animation: coinPulse 0.3s ease-out;
+        }
+        
+        .plus-one {
+            position: absolute;
+            color: #FFD700;
+            font-size: 2rem;
+            font-weight: 900;
+            pointer-events: none;
+            z-index: 10;
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.8),
+                2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: floatUp 1s ease-out forwards;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            animation: slideInUp 1s ease-out 0.9s both;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #FFD700;
+            border-radius: 15px;
+            padding: 15px;
+            flex: 1;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #FFD700;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #FFD700;
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes coinPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.2);
+            }
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0.6; 
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg); 
+                opacity: 0.2; 
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .coin {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+            
+            .score {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🪙 شاهمرادی کلیکر 🪙</h1>
+        </div>
+        
+        <div class="score-container">
+            <div class="score-label">امتیاز شما</div>
+            <div class="score" id="score">0</div>
+        </div>
+        
+        <div class="coin-container">
+            <div class="coin" id="coin">
+                <img src="SMC-pic.png" alt="سکه" />
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">کل کلیک‌ها</div>
+                <div class="stat-value" id="clicks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">کلیک در ثانیه</div>
+                <div class="stat-value" id="cps">0.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let clicks = 0;
+        let clickTimes = [];
+        
+        const scoreElement = document.getElementById('score');
+        const clicksElement = document.getElementById('clicks');
+        const cpsElement = document.getElementById('cps');
+        const coinElement = document.getElementById('coin');
+        
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Update score with animation
+        function updateScore() {
+            score++;
+            clicks++;
+            
+            // Update display
+            scoreElement.textContent = score.toLocaleString('fa-IR');
+            clicksElement.textContent = clicks.toLocaleString('fa-IR');
+            
+            // Add click time for CPS calculation
+            const now = Date.now();
+            clickTimes.push(now);
+            
+            // Keep only clicks from last 5 seconds
+            clickTimes = clickTimes.filter(time => now - time < 5000);
+            
+            // Calculate CPS
+            const cps = clickTimes.length / 5;
+            cpsElement.textContent = cps.toFixed(1);
+            
+            // Score pulse animation
+            scoreElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                scoreElement.style.transform = 'scale(1)';
+            }, 150);
+        }
+        
+        // Create +1 animation
+        function createPlusOne(x, y) {
+            const plusOne = document.createElement('div');
+            plusOne.className = 'plus-one';
+            plusOne.textContent = '+1';
+            plusOne.style.left = (x - 20) + 'px';
+            plusOne.style.top = (y - 20) + 'px';
+            
+            document.body.appendChild(plusOne);
+            
+            // Remove element after animation
+            setTimeout(() => {
+                if (plusOne.parentNode) {
+                    plusOne.parentNode.removeChild(plusOne);
+                }
+            }, 1000);
+        }
+        
+        // Handle coin click
+        coinElement.addEventListener('click', function(e) {
+            // Add clicked class for animation
+            this.classList.add('clicked');
+            setTimeout(() => {
+                this.classList.remove('clicked');
+            }, 300);
+            
+            // Update score
+            updateScore();
+            
+            // Get click position relative to viewport
+            const rect = this.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            // Create +1 animation
+            createPlusOne(x, y);
+            
+            // Add some visual feedback
+            this.style.filter = 'brightness(1.2)';
+            setTimeout(() => {
+                this.style.filter = 'brightness(1)';
+            }, 100);
+        });
+        
+        // Add haptic feedback for mobile
+        coinElement.addEventListener('touchstart', function() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        });
+        
+        // Prevent context menu on coin
+        coinElement.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // Initialize particles
+        createParticles();
+        
+        // Add keyboard support (space bar)
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                coinElement.click();
+            }
+        });
+        
+        // Save progress to localStorage (temporary solution)
+        function saveProgress() {
+            const gameData = {
+                score: score,
+                clicks: clicks,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('coinClickerData', JSON.stringify(gameData));
+        }
+        
+        // Load progress from localStorage
+        function loadProgress() {
+            const savedData = localStorage.getItem('coinClickerData');
+            if (savedData) {
+                const gameData = JSON.parse(savedData);
+                score = gameData.score || 0;
+                clicks = gameData.clicks || 0;
+                
+                scoreElement.textContent = score.toLocaleString('fa-IR');
+                clicksElement.textContent = clicks.toLocaleString('fa-IR');
+            }
+        }
+        
+        // Auto-save every 5 seconds
+        setInterval(saveProgress, 5000);
+        
+        // Load progress on start
+        loadProgress();
+        
+        // Save on page unload
+        window.addEventListener('beforeunload', saveProgress);
+        
+        console.log('🪙 شاهمرادی کلیکر آماده است! روی سکه کلیک کنید یا کلید Space را فشار دهید.');
+    </script>
+</body>
+</html>
